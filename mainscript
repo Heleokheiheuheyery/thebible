@@ -1,49 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>bible.exe</title>
-  <style>
-    body {
-      background-color: black;
-      color: lime;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: "Courier New", monospace;
-      font-size: 10rem;
-      animation: flicker 1.5s infinite alternate;
-    }
+const letterDiv = document.getElementById('letter');
 
-    @keyframes flicker {
-      0%   { opacity: 0.9; text-shadow: 0 0 10px lime; }
-      100% { opacity: 1; text-shadow: 0 0 20px lime; }
-    }
-  </style>
-</head>
-<body>
-  <div id="letter">🙏</div>
+fetch('CSB_Pew_Bible_2nd_Printing.txt')
+  .then(response => response.text())
+  .then(data => {
+    // Clean and flatten the text to individual letters
+    const letters = data.replace(/[^a-zA-Z]/g, '').split('');
 
-  <script>
-    // Load Bible string (simplified version of Genesis 1 for demo)
-    const bibleText = `In the beginning God created the heaven and the earth. 
-    And the earth was without form, and void; and darkness was upon the face of the deep. 
-    And the Spirit of God moved upon the face of the waters.`; // Replace with full Bible if desired
-
-    // Flatten and clean the string
-    const bibleLetters = bibleText.replace(/[^a-zA-Z]/g, '').split('');
-
-    // Calculate current letter index based on current month/year
-    const startDate = new Date('2024-01-01'); // start date of bible.exe
+    // Get how many months have passed since start
+    const startDate = new Date('2024-01-01');
     const now = new Date();
-    const monthsSince = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+    const monthsSince = (now.getFullYear() - startDate.getFullYear()) * 12 +
+                        (now.getMonth() - startDate.getMonth());
 
-    const index = monthsSince % bibleLetters.length; // wrap around if we loop the whole Bible
-    const currentLetter = bibleLetters[index] || '✝️';
+    const index = monthsSince % letters.length;
+    const currentLetter = letters[index] || '✝️';
 
-    // Set the letter
-    document.getElementById('letter').textContent = currentLetter.toUpperCase();
-  </script>
-</body>
-</html>
+    letterDiv.textContent = currentLetter.toUpperCase();
+  })
+  .catch(err => {
+    console.error("Failed to load Bible text:", err);
+    letterDiv.textContent = '😢';
+  });
